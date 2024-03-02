@@ -2,17 +2,18 @@ const express = require('express')
 const dotenv = require("dotenv")
 const db = require("./config/dbconnection");
 const cors = require('cors')
+const status404Handler = require('./middleware/404ErrorHandler')
 const PORT = 3000;
 
 //Models Section
-const user = require('./models/user')
-const book = require('./models/book')
-const review = require('./models/review')
+const user = require('./models/userDTO')
+const book = require('./models/booksDTO')
+const bookReview = require('./models/bookReviewDTO')
 
 //Routes Section
-const authRoutes = require('./routes/auth')
-
-
+const authRoutes = require('./routes/authRouter')
+const booksRoutes = require('./routes/bookRouter')
+const reviewRoutes = require('./routes/reviewRouter')
 //Database Configuration File
 dotenv.config();
 
@@ -23,10 +24,14 @@ app.use(cors())
 app.use(express.json())
 
 //Routes with app use
-const baseUrl = "/api/v1"
+const baseUrl = "/api/"
 app.use(baseUrl,authRoutes);
+app.use(baseUrl,booksRoutes)
+app.use(baseUrl,reviewRoutes)
 
 
+//error Handler
+app.use(status404Handler)
 //Database Connectivity Check
 
 db.connectDatabase();

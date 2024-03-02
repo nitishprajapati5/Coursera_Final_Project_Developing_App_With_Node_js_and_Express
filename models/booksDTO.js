@@ -4,7 +4,7 @@ const { sequelize } = require('../config/dbconnection'); // Note the use of sequ
 const book = sequelize.define('Book',{
     ISBN : {
         type : DataTypes.STRING,
-        allowNull : false
+        allowNull : false,
     },
     title : {
         type:DataTypes.STRING,
@@ -17,7 +17,7 @@ const book = sequelize.define('Book',{
 },
     {
         freezeTableName:true,
-        tablename:"Affirmation"
+        tablename:"Book"
     }
 );
 

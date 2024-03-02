@@ -1,6 +1,7 @@
-const user = require('../models/user')
+const user = require('../models/userDTO')
 const { hashPassword,compare_hashed_passwords } =  require('../utilities/passwordhashing')
 const tokenization = require('../utilities/tokens')
+const codeMessage = require('../config/constant')
 
 const register = async (req,res) => {
     try{
@@ -13,10 +14,14 @@ const register = async (req,res) => {
                 username : username
             }
         });
+
         console.log(userFound.length);
-        if(userFound){
+        //console.log
+        if(userFound.length > 0){
             return res.json({
-                message : "Already user in Database"
+                StatusCodeMessage : codeMessage.SuccessCode,
+                statusCode : codeMessage.DuplicateStatusCode,
+                message : codeMessage.DuplicateCode
             });
         }
 
@@ -30,13 +35,20 @@ const register = async (req,res) => {
         });
 
         res.json({
-            message : "User Registration done successfully"
+            StatusCodeMessage : codeMessage.SuccessCode,
+            StatusCode : codeMessage.successStatusCode,
+            message : codeMessage.RegistrationCode,
+            data:{
+                username:username,
+                password:password
+            }
         })
 
     }
     catch(error){
         res.status(500).json({
-            message:"INTERNAL_SERVER_ERROR"
+            StatusCode : codeMessage.InternalServerErrorStatusCode,
+            SuccessCodeMessage:codeMessage.Internal_Server_Error
         });
     }
 }
@@ -55,27 +67,34 @@ const login = async(req,res) => {
 
         if(!checkRegistration){
             return res.json({
-                message : "Wrong Credentials Invalid"
+                statusCode : codeMessage.BadRequestStatusCode,
+                StatusCodeMessage : codeMessage.BadRequestCode
             });
         }
-        console.log("Checking Registration ",checkRegistration.password);
+        //console.log("Checking Registration ",checkRegistration.password);
         //Password Checking Process
         const isMatched = await compare_hashed_passwords(password,checkRegistration.password);
         if(!isMatched){
             return res.json({
-                message : "Wrong Credentials Invalid Request"
+                statusCode : codeMessage.BadRequestStatusCode,
+                StatusCodeMessage : codeMessage.BadRequestCode
             });
         }
         const token = tokenization.createToken(checkRegistration.Id,username);
-        console.log(token);
+        //console.log(token);
         return res.json({
-            message : "User logged in Successfully ",token
+            statusCode : codeMessage.SuccessCode,
+            StatusCodeMessage : codeMessage.UserLoggedCode,
+            data : {
+                token
+            }
         });
     }
     catch(error){
         res.status(500).json({
-            message : "INTERNAL SERVER ERROR"
-        })
+            StatusCode : codeMessage.InternalServerErrorStatusCode,
+            SuccessCodeMessage:codeMessage.Internal_Server_Error
+        });
     }
 }
 
